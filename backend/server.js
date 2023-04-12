@@ -51,9 +51,9 @@ server.on("listening", () => {
 
 server.listen(port);
 
-const keyPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/privkey3.pem";
-const certPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/fullchain3.pem";
+//const keyPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/privkey3.pem";
+//const certPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/fullchain3.pem";
 
-const sslServer = https.createServer({ key: fs.readFileSync(keyPath), cert: fs.readFileSync(certPath) }, app);
+//const sslServer = https.createServer({ key: fs.readFileSync(keyPath), cert: fs.readFileSync(certPath) }, app);
 
-sslServer.listen(process.env.SSL_PORT, () => console.log("Ssl server listening " + process.env.SSL_PORT));
+//sslServer.listen(process.env.SSL_PORT, () => console.log("Ssl server listening " + process.env.SSL_PORT));

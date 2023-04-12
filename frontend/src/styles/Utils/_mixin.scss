@@ -1,0 +1,21 @@
+@mixin tablet-only {
+  @media screen and (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop-only {
+  @media screen and (min-width: $breakpoint-desktop) {
+    @content;
+  }
+}
+
+@mixin flex-column-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@mixin box-shadow {
+  box-shadow: -3px 3px 4px black;
+}

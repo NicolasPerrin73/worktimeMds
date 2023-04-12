@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  box-shadow: -3px 3px 10px black;
+
+  @include desktop-only {
+  }
+
+  &__logo {
+    width: 150px;
+
+    @include desktop-only {
+    }
+  }
+}

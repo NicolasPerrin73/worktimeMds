@@ -1,7 +1,7 @@
 //Module
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const groupomaniaDB = require("../middleware/MySqlConnection");
+const planningMdsDB = require("../middleware/MySqlConnection");
 const fs = require("fs");
 
 // Sign up
@@ -15,23 +15,17 @@ exports.signup = (req, res, next) => {
       .hash(req.body.password, 10)
       .then((hash) => {
         const hashPassword = hash;
-        const insertQuery = "INSERT INTO `user`(`email`, `password`,`nom`,`prenom`) VALUES (?,?,?,?)";
-        groupomaniaDB.query(insertQuery, [req.body.email, hashPassword, req.body.firstName, req.body.lastName], function (err, results, fields) {
+        const insertQuery = "INSERT INTO `user`(`email`, `password`,`first_name`,`last_name`) VALUES (?,?,?,?)";
+        planningMdsDB.query(insertQuery, [req.body.email, hashPassword, req.body.firstName, req.body.lastName], function (err, results, fields) {
           //Find user id created to login
           if (results != undefined) {
             const selectQuery = "SELECT id FROM user WHERE email = ?";
-            groupomaniaDB.query(selectQuery, [req.body.email], function (err, results, fields) {
+            planningMdsDB.query(selectQuery, [req.body.email], function (err, results, fields) {
               if (err != null) {
                 res.status(500).json("signup error : " + err.message + " at file ../controllers/user.js:line26");
-                //Add signed token to database, send userId and token
+                //send userId and token
               } else {
                 const token = jwt.sign({ userId: results[0].id }, process.env.TOKEN_KEY, { expiresIn: "7d" });
-                const updateQuery = "UPDATE user SET token = ? WHERE email = ?";
-                groupomaniaDB.query(updateQuery, [token, req.body.email], function (err, results, fields) {
-                  if (err != null) {
-                    res.status(500).json("signup error : " + err.message + " at file ../controllers/user.js:line33");
-                  }
-                });
                 res.status(200).json({
                   userId: results[0].id,
                   token: token,
@@ -40,11 +34,11 @@ exports.signup = (req, res, next) => {
             });
           } else {
             console.log(err);
-            return res.status(400).json("signup error: " + err.message + " at file ../controllers/user.js:line44");
+            return res.status(400).json("signup error: " + err.message + " at file ../controllers/user.js:line37");
           }
         });
       })
-      .catch((error) => res.status(500).json("bcrypt error: " + error + " at file ../controllers/user.js:line48"));
+      .catch((error) => res.status(500).json("bcrypt error: " + error + " at file ../controllers/user.js:line41"));
   }
 };
 
@@ -52,9 +46,9 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res, next) => {
   //Find user in database by email
   const query = "SELECT id,password FROM user WHERE email = ?";
-  groupomaniaDB.query(query, [req.body.email], function (err, results, fields) {
+  planningMdsDB.query(query, [req.body.email], function (err, results, fields) {
     if (err != null) {
-      res.status(500).json("login error : " + err.message + " at file ../controllers/user.js:line58");
+      res.status(500).json("login error : " + err.message + " at file ../controllers/user.js:line51");
       //User not find
     } else if (results[0] == undefined) {
       res.status(401).json("login error: Invalid user or password");
@@ -69,19 +63,27 @@ exports.login = (req, res, next) => {
             //Password correct
           } else {
             const token = jwt.sign({ userId: results[0].id }, process.env.TOKEN_KEY, { expiresIn: "7d" });
-            const query = "UPDATE user SET token = ? WHERE email = ?";
-            groupomaniaDB.query(query, [token, req.body.email], function (err, results, fields) {
-              if (err != null) {
-                res.status(500).json("login error : " + err.message + " at file ../controllers/user.js:line76");
-              }
-            });
             res.status(200).json({
               userId: results[0].id,
               token: token,
             });
           }
         })
-        .catch((error) => res.status(500).json("bcrypt error: " + error + " at file ../controllers/user.js:line85"));
+        .catch((error) => res.status(500).json("bcrypt error: " + error + " at file ../controllers/user.js:line72"));
+    }
+  });
+};
+
+//Get user data from request
+exports.getUserData = (req, res, next) => {
+  const query = "SELECT `id`,`last_name`,`first_name` FROM user WHERE id = ?";
+  planningMdsDB.query(query, [req.auth.userId], function (err, userData, fields) {
+    if (err != null) {
+      res.status(500).json("getUserData error: " + err.message + " at file ../controllers/user.js:line95");
+    } else if (userData.length == 0) {
+      res.status(404).json("getUserData error: User not found at file ../controllers/user.js:line97");
+    } else {
+      res.status(200).json(userData);
     }
   });
 };

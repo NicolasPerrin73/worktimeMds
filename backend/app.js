@@ -5,7 +5,6 @@ const path = require("path");
 
 // Routes file
 const userRoutes = require("./routes/user");
-const postRoutes = require("./routes/post");
 
 // Express
 const app = express();
