@@ -5,6 +5,7 @@ const path = require("path");
 
 // Routes file
 const userRoutes = require("./routes/user");
+const planningRoutes = require("./routes/planning");
 
 // Express
 const app = express();
@@ -23,5 +24,6 @@ app.use((req, res, next) => {
 //Endpoint
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 app.use("/api/auth", userRoutes);
+app.use("/api/planning", planningRoutes);
 
 module.exports = app;

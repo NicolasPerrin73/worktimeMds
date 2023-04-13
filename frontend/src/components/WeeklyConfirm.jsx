@@ -1,9 +1,26 @@
+import axios from "axios";
 import React from "react";
 
 const WeeklyConfirm = ({ daysOfWeek, daysOfWeekFr, hoursPerDay, weekWorkTime, submitClick, setSubmitClick }) => {
   const handleSend = (e) => {
+    const data = [hoursPerDay, weekWorkTime];
     console.log("envoie api");
     setSubmitClick(false);
+    const token = localStorage.getItem("token");
+    axios
+      .post(
+        "http://localhost:3009/api/planning",
+        {
+          data,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleCancel = (e) => {
