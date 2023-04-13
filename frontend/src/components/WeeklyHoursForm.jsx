@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { startOfWeek, addDays } from "date-fns";
 import moment from "moment";
+import WeeklyConfirm from "./WeeklyConfirm";
 
 const WeeklyHoursForm = () => {
   const [weekNumber, setWeekNumber] = useState("");
@@ -15,21 +15,24 @@ const WeeklyHoursForm = () => {
     { day: "saturday", start: "", end: "", pause: "", worktime: "" },
     { day: "sunday", start: "", end: "", pause: "", worktime: "" },
   ]);
-  const [weekWorkTime, setWeekWorkTime] = useState({ weekNumber: weekNumber, totalHours: 0, modulationHours: 0, additionalHours: 0 });
+  const [weekWorkTime, setWeekWorkTime] = useState({
+    weekNumber: weekNumber,
+    totalHours: 0,
+    modulationHours: 0,
+    additionalHours: 0,
+  });
+  const [submitClick, setSubmitClick] = useState(false);
 
-  function getDaysOfWeek(weekNumber) {
+  const getDaysOfWeek = (weekNumber) => {
     const today = new Date();
     const year = today.getFullYear();
-
     // Trouver le premier jour de l'année qui commence par un lundi
     let startDate = new Date(year, 0, 1);
     while (startDate.getDay() !== 1) {
       startDate.setDate(startDate.getDate() + 1);
     }
-
     // Ajouter le nombre de semaines au début de l'année pour trouver la semaine demandée
     startDate.setDate(startDate.getDate() + 7 * (weekNumber - 1));
-
     // Créer un tableau des jours de la semaine demandée
     const daysOfWeekFr = [];
     const daysOfWeek = [];
@@ -41,14 +44,14 @@ const WeeklyHoursForm = () => {
       const date = moment(day).format("YYYY-MM-DD"); // Conversion de la date en format "YYYY-MM-DD"
       daysOfWeek.push(date);
     }
-
     setDaysOfWeekFr(daysOfWeekFr);
     setDaysOfWeek(daysOfWeek);
-  }
+  };
 
   const handleWeekChange = (e) => {
     setWeekNumber(e.target.value);
     getDaysOfWeek(e.target.value);
+    setWeekWorkTime({ ...weekWorkTime, weekNumber: e.target.value });
   };
 
   const handleStartHour = (day, index, value) => {
@@ -69,7 +72,7 @@ const WeeklyHoursForm = () => {
     setHoursPerDay(hoursPerDayNewArray);
   };
 
-  const calc = (i) => {
+  const workTimeCalcul = (i) => {
     if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "") {
       return 0;
     } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "") {
@@ -81,9 +84,22 @@ const WeeklyHoursForm = () => {
       const diffInMs = endDate - startDate;
       // Calcul du nombre d'heures arrondi à 2 décimales
       const diffInHours = Math.round((diffInMs / (1000 * 60 * 60)) * 100) / 100;
-      const wortimeResult = diffInHours - Number(hoursPerDay[i].pause);
+      let wortimeResult = diffInHours - Number(hoursPerDay[i].pause);
+      if (wortimeResult < 0) {
+        wortimeResult = "Erreur";
+      }
 
       return wortimeResult;
+    }
+  };
+
+  const weeklyWorkingHours = (totalHours) => {
+    if (totalHours <= 35) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0 });
+    } else if (totalHours <= 42) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0 });
+    } else {
+      return setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: 7, additionalHours: totalHours - 42 });
     }
   };
 
@@ -91,36 +107,49 @@ const WeeklyHoursForm = () => {
     e.preventDefault();
     let hoursPerDayNewArray = hoursPerDay.slice();
     for (let i = 0; i < hoursPerDay.length; i++) {
-      let worktime = calc(i);
-      calc(i);
+      let worktime = workTimeCalcul(i);
       hoursPerDayNewArray[i] = { ...hoursPerDayNewArray[i], worktime: worktime };
       setHoursPerDay(hoursPerDayNewArray);
     }
     let wortimeArray = [];
     let totalHours = 0;
     for (let i = 0; i < hoursPerDayNewArray.length; i++) {
-      wortimeArray.push(hoursPerDayNewArray[i].worktime);
-      totalHours = wortimeArray.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue;
-      });
-      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours });
-    }
-
-    function calculerHeures(h) {
-      if (h <= 35) {
-        setWeekWorkTime({ ...weekWorkTime, totalHours: h, modulationHours: 0, additionalHours: 0 });
-      } else if (h <= 42) {
-        setWeekWorkTime({ ...weekWorkTime, totalHours: h, modulationHours: h - 35, additionalHours: 0 });
+      if (hoursPerDayNewArray[i].worktime === "Erreur") {
+        alert("Erreur de saisie, calcul impossible");
       } else {
-        return setWeekWorkTime({ ...weekWorkTime, totalHours: h, modulationHours: 7, additionalHours: h - 42 });
+        wortimeArray.push(hoursPerDayNewArray[i].worktime);
+        totalHours = wortimeArray.reduce((accumulator, currentValue) => {
+          return accumulator + currentValue;
+        });
+        setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours });
       }
     }
-    calculerHeures(totalHours);
+    weeklyWorkingHours(totalHours);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    let hoursPerDayNewArray = hoursPerDay.slice();
+    for (let i = 0; i < hoursPerDay.length; i++) {
+      let worktime = workTimeCalcul(i);
+      hoursPerDayNewArray[i] = { ...hoursPerDayNewArray[i], worktime: worktime };
+      setHoursPerDay(hoursPerDayNewArray);
+    }
+    let wortimeArray = [];
+    let totalHours = 0;
+    for (let i = 0; i < hoursPerDayNewArray.length; i++) {
+      if (hoursPerDayNewArray[i].worktime === "Erreur") {
+        alert("Erreur de saisie, calcul impossible");
+      } else {
+        wortimeArray.push(hoursPerDayNewArray[i].worktime);
+        totalHours = wortimeArray.reduce((accumulator, currentValue) => {
+          return accumulator + currentValue;
+        });
+        setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours });
+      }
+    }
+    weeklyWorkingHours(totalHours);
+    setSubmitClick(true);
     // envoyer les données à l'API ici
   };
 
@@ -136,51 +165,11 @@ const WeeklyHoursForm = () => {
           <p>{day}</p>
           <label>
             Prise de poste:
-            <select onChange={(e) => handleStartHour(day, index, e.target.value)}>
-              <option value="">Début</option>
-              <option value="05:00">05:00</option>
-              <option value="07:00">06:00</option>
-              <option value="07:00">07:00</option>
-              <option value="08:00">08:00</option>
-              <option value="09:00">09:00</option>
-              <option value="10:00">10:00</option>
-              <option value="11:00">11:00</option>
-              <option value="12:00">12:00</option>
-              <option value="13:00">13:00</option>
-              <option value="14:00">14:00</option>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-              <option value="19:00">19:00</option>
-              <option value="20:00">20:00</option>
-              <option value="21:00">21:00</option>
-              <option value="20:00">22:00</option>
-            </select>
+            <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(day, index, e.target.value)} />
           </label>
           <label>
             Fin de poste:
-            <select onChange={(e) => handleEndHour(day, index, e.target.value)}>
-              <option value="">Fin</option>
-              <option value="05:00">05:00</option>
-              <option value="07:00">06:00</option>
-              <option value="07:00">07:00</option>
-              <option value="08:00">08:00</option>
-              <option value="09:00">09:00</option>
-              <option value="10:00">10:00</option>
-              <option value="11:00">11:00</option>
-              <option value="12:00">12:00</option>
-              <option value="13:00">13:00</option>
-              <option value="14:00">14:00</option>
-              <option value="15:00">15:00</option>
-              <option value="16:00">16:00</option>
-              <option value="17:00">17:00</option>
-              <option value="18:00">18:00</option>
-              <option value="19:00">19:00</option>
-              <option value="20:00">20:00</option>
-              <option value="21:00">21:00</option>
-              <option value="20:00">22:00</option>
-            </select>
+            <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(day, index, e.target.value)} />
           </label>
 
           <label>
@@ -194,7 +183,8 @@ const WeeklyHoursForm = () => {
               <option value="2">2</option>
             </select>
           </label>
-          <p>Nombre d'heure travailler: {hoursPerDay[index].worktime}</p>
+
+          {hoursPerDay[index].worktime === "Erreur" ? <p>Erreur</p> : <p>Nombre d'heure travailler: {hoursPerDay[index].worktime}</p>}
         </div>
       ))}
 
@@ -204,7 +194,13 @@ const WeeklyHoursForm = () => {
 
       <button onClick={handleCalcHour}>Calcul</button>
 
-      <button type="submit">Submit</button>
+      <button onClick={handleSubmit}>Envoyer</button>
+
+      {submitClick ? (
+        <WeeklyConfirm daysOfWeek={daysOfWeek} daysOfWeekFr={daysOfWeekFr} hoursPerDay={hoursPerDay} weekWorkTime={weekWorkTime} submitClick={submitClick} setSubmitClick={setSubmitClick} />
+      ) : (
+        ""
+      )}
     </form>
   );
 };
