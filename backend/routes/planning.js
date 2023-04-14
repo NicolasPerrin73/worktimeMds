@@ -12,6 +12,7 @@ const planningMdsDB = require("../middleware/MySqlConnection");
 const planningCtrl = require("../controllers/planning");
 
 //Endpoints for post
-router.post("/", auth, planningCtrl.addWeek);
+router.post("/hours", auth, planningCtrl.addWeekHours);
+router.post("/planning", auth, planningCtrl.addWeekPlanning);
 
 module.exports = router;

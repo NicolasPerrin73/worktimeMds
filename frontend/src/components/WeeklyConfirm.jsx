@@ -9,7 +9,22 @@ const WeeklyConfirm = ({ daysOfWeek, daysOfWeekFr, hoursPerDay, weekWorkTime, su
     const token = localStorage.getItem("token");
     axios
       .post(
-        "http://localhost:3009/api/planning",
+        "http://localhost:3009/api/planning/hours",
+        {
+          data,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    axios
+      .post(
+        "http://localhost:3009/api/planning/planning",
         {
           data,
         },

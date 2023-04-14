@@ -3,6 +3,8 @@ import { useUserdata } from "../hooks/hooks";
 import Header from "../components/Header";
 import { useState } from "react";
 import moment from "moment";
+import FullCalendar from "@fullcalendar/react"; // must go before plugins
+import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
 
 import WeeklyHoursForm from "../components/WeeklyHoursForm";
 
@@ -18,6 +20,7 @@ const Home = () => {
     <>
       <Header userData={userData} />
       <WeeklyHoursForm />
+      <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" />
     </>
   );
 };

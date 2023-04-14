@@ -73,18 +73,22 @@ const WeeklyHoursForm = () => {
   };
 
   const workTimeCalcul = (i) => {
-    if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "") {
+    if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "" || hoursPerDay[i].pause === "") {
       return 0;
-    } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "") {
+    } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "" && hoursPerDay[i].pause !== "") {
       // Date de début
       const startDate = new Date(`${daysOfWeek[i]}T${hoursPerDay[i].start}:00`);
       // Date de fin
       const endDate = new Date(`${daysOfWeek[i]}T${hoursPerDay[i].end}:00`);
+      // Temps de pause
+      const [hours, minutes] = hoursPerDay[i].pause.split(":");
+      const breakInMs = (+hours * 60 + +minutes) * 60 * 1000;
+
       // Calcul du nombre de millisecondes entre les deux dates
-      const diffInMs = endDate - startDate;
+      const diffInMs = endDate - startDate - breakInMs;
       // Calcul du nombre d'heures arrondi à 2 décimales
-      const diffInHours = Math.round((diffInMs / (1000 * 60 * 60)) * 100) / 100;
-      let wortimeResult = diffInHours - Number(hoursPerDay[i].pause);
+      let wortimeResult = Math.round((diffInMs / (1000 * 60 * 60)) * 100) / 100;
+
       if (wortimeResult < 0) {
         wortimeResult = "Erreur";
       }
@@ -173,15 +177,8 @@ const WeeklyHoursForm = () => {
           </label>
 
           <label>
-            Heure de pause:
-            <select onChange={(e) => handleBreakHour(day, index, e.target.value)}>
-              <option value="">Temps de pause</option>
-              <option value="0">0</option>
-              <option value="0.5">0.5</option>
-              <option value="1">1</option>
-              <option value="1.5">1.5</option>
-              <option value="2">2</option>
-            </select>
+            Temps de pause:
+            <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(day, index, e.target.value)} />
           </label>
 
           {hoursPerDay[index].worktime === "Erreur" ? <p>Erreur</p> : <p>Nombre d'heure travailler: {hoursPerDay[index].worktime}</p>}
