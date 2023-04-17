@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import moment from "moment";
 import WeeklyConfirm from "./WeeklyConfirm";
 
-const WeeklyHoursForm = () => {
+const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
   const [weekNumber, setWeekNumber] = useState("");
   const [daysOfWeek, setDaysOfWeek] = useState([]);
-  const [daysOfWeekFr, setDaysOfWeekFr] = useState([]);
   const [hoursPerDay, setHoursPerDay] = useState([
     { day: "monday", start: "", end: "", pause: "", worktime: "" },
     { day: "tuesday", start: "", end: "", pause: "", worktime: "" },
@@ -23,6 +22,25 @@ const WeeklyHoursForm = () => {
   });
   const [submitClick, setSubmitClick] = useState(false);
 
+  useEffect(() => {}, [hoursPerDay, daysOfWeek, weekNumber]);
+
+  useEffect(() => {
+    if (daysOfWeek.length !== 0) {
+      for (let i = 0; i < hoursPerDay.length; i++) {
+        hoursPerDay[i] = { ...hoursPerDay[i], day: daysOfWeek[i].date };
+      }
+    }
+    const eventsArray = hoursPerDay
+      .filter(({ start, end }) => start !== "" && end !== "") // Filter out items with empty start and end
+      .map(({ day, start, end, worktime, pause }) => ({
+        title: `travail ${worktime}h, dont ${pause}h de pause`,
+        start: `${day}T${start}:00`,
+        end: `${day}T${end}:00`,
+      }));
+
+    setEvents(eventsArray);
+  }, [weekNumber, daysOfWeek, hoursPerDay]);
+
   const getDaysOfWeek = (weekNumber) => {
     const today = new Date();
     const year = today.getFullYear();
@@ -34,17 +52,23 @@ const WeeklyHoursForm = () => {
     // Ajouter le nombre de semaines au début de l'année pour trouver la semaine demandée
     startDate.setDate(startDate.getDate() + 7 * (weekNumber - 1));
     // Créer un tableau des jours de la semaine demandée
-    const daysOfWeekFr = [];
-    const daysOfWeek = [];
+
+    const daysOfWeek = [
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+      { date: "", dateFr: "" },
+    ];
     for (let i = 0; i < 7; i++) {
       let day = new Date(startDate);
       day.setDate(startDate.getDate() + i);
       const dateFr = day.toLocaleDateString("fr-FR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-      daysOfWeekFr.push(dateFr);
       const date = moment(day).format("YYYY-MM-DD"); // Conversion de la date en format "YYYY-MM-DD"
-      daysOfWeek.push(date);
+      daysOfWeek[i] = { ...daysOfWeek[i], date: date, dateFr: dateFr };
     }
-    setDaysOfWeekFr(daysOfWeekFr);
     setDaysOfWeek(daysOfWeek);
   };
 
@@ -77,9 +101,9 @@ const WeeklyHoursForm = () => {
       return 0;
     } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "" && hoursPerDay[i].pause !== "") {
       // Date de début
-      const startDate = new Date(`${daysOfWeek[i]}T${hoursPerDay[i].start}:00`);
+      const startDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].start}:00`);
       // Date de fin
-      const endDate = new Date(`${daysOfWeek[i]}T${hoursPerDay[i].end}:00`);
+      const endDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].end}:00`);
       // Temps de pause
       const [hours, minutes] = hoursPerDay[i].pause.split(":");
       const breakInMs = (+hours * 60 + +minutes) * 60 * 1000;
@@ -164,21 +188,22 @@ const WeeklyHoursForm = () => {
         <input type="number" value={weekNumber} onChange={handleWeekChange} />
       </label>
 
-      {daysOfWeekFr.map((day, index) => (
-        <div key={day}>
-          <p>{day}</p>
+      {daysOfWeek.map((dayFr, index) => (
+        <div key={index}>
+          <p>{daysOfWeek[index].dateFr}</p>
+
           <label>
             Prise de poste:
-            <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(day, index, e.target.value)} />
+            <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(daysOfWeek[index].date, index, e.target.value)} />
           </label>
           <label>
             Fin de poste:
-            <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(day, index, e.target.value)} />
+            <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(daysOfWeek[index].date, index, e.target.value)} />
           </label>
 
           <label>
             Temps de pause:
-            <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(day, index, e.target.value)} />
+            <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(daysOfWeek[index].date, index, e.target.value)} />
           </label>
 
           {hoursPerDay[index].worktime === "Erreur" ? <p>Erreur</p> : <p>Nombre d'heure travailler: {hoursPerDay[index].worktime}</p>}
@@ -194,7 +219,16 @@ const WeeklyHoursForm = () => {
       <button onClick={handleSubmit}>Envoyer</button>
 
       {submitClick ? (
-        <WeeklyConfirm daysOfWeek={daysOfWeek} daysOfWeekFr={daysOfWeekFr} hoursPerDay={hoursPerDay} weekWorkTime={weekWorkTime} submitClick={submitClick} setSubmitClick={setSubmitClick} />
+        <WeeklyConfirm
+          daysOfWeek={daysOfWeek}
+          hoursPerDay={hoursPerDay}
+          weekWorkTime={weekWorkTime}
+          submitClick={submitClick}
+          setSubmitClick={setSubmitClick}
+          events={events}
+          dataSent={dataSent}
+          setDataSent={setDataSent}
+        />
       ) : (
         ""
       )}

@@ -1,9 +1,9 @@
 import axios from "axios";
 import React from "react";
 
-const WeeklyConfirm = ({ daysOfWeek, daysOfWeekFr, hoursPerDay, weekWorkTime, submitClick, setSubmitClick }) => {
+const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, setSubmitClick, events, dataSent, setDataSent }) => {
   const handleSend = (e) => {
-    const data = [hoursPerDay, weekWorkTime];
+    const data = [hoursPerDay, weekWorkTime, events];
     console.log("envoie api");
     setSubmitClick(false);
     const token = localStorage.getItem("token");
@@ -32,6 +32,10 @@ const WeeklyConfirm = ({ daysOfWeek, daysOfWeekFr, hoursPerDay, weekWorkTime, su
       )
       .then((res) => {
         console.log(res);
+        setDataSent(true);
+        setTimeout(() => {
+          setDataSent(false);
+        }, 1000);
       })
       .catch((err) => {
         console.log(err);
@@ -47,10 +51,10 @@ const WeeklyConfirm = ({ daysOfWeek, daysOfWeekFr, hoursPerDay, weekWorkTime, su
     <>
       <div>
         <h2>Merci de verifier les informations avant envoi:</h2>
-        {daysOfWeekFr.map((day, index) => (
-          <div key={day}>
+        {daysOfWeek.map((dayFr, index) => (
+          <div key={index}>
             <p>
-              {day}: {hoursPerDay[index].start}-{hoursPerDay[index].end} avec {hoursPerDay[index].pause}h de pause
+              {daysOfWeek[index].dateFr}: {hoursPerDay[index].start}-{hoursPerDay[index].end} avec {hoursPerDay[index].pause}h de pause
             </p>
           </div>
         ))}

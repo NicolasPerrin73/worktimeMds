@@ -14,5 +14,6 @@ const planningCtrl = require("../controllers/planning");
 //Endpoints for post
 router.post("/hours", auth, planningCtrl.addWeekHours);
 router.post("/planning", auth, planningCtrl.addWeekPlanning);
+router.get("/planning", auth, planningCtrl.getPlanning);
 
 module.exports = router;
