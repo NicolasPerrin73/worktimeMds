@@ -1,0 +1,21 @@
+.confirm {
+  width: 95%;
+  background-color: $color-secondary !important;
+
+  & h2 {
+    text-align: center;
+  }
+  & li {
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: $color-tertiary;
+    @include border-radius;
+    width: 98%;
+  }
+
+  &__result {
+    background-color: $color-quaternary;
+    padding: 5px;
+    @include border-radius;
+  }
+}

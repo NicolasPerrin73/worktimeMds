@@ -182,57 +182,76 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Semaine n°:
-        <input type="number" value={weekNumber} onChange={handleWeekChange} />
-      </label>
+    <>
+      <h1>Saisie de planification:</h1>
+      <form onSubmit={handleSubmit} className="weekForm">
+        {submitClick ? (
+          ""
+        ) : (
+          <div>
+            <label htmlFor="week" className="weekForm__label weekForm__label--week">
+              <span>Semaine n°:</span>
+              <input type="number" id="week" value={weekNumber} onChange={handleWeekChange} />
+            </label>
 
-      {daysOfWeek.map((dayFr, index) => (
-        <div key={index}>
-          <p>{daysOfWeek[index].dateFr}</p>
+            {daysOfWeek.map((dayFr, index) => (
+              <ul key={index}>
+                <li>{daysOfWeek[index].dateFr}</li>
+                <div className="weekForm__days">
+                  <li>
+                    <label htmlFor="start-time" className="weekForm__label">
+                      Prise de poste:
+                      <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(daysOfWeek[index].date, index, e.target.value)} />
+                    </label>
+                  </li>
+                  <li>
+                    <label htmlFor="end-time" className="weekForm__label">
+                      Fin de poste:
+                      <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(daysOfWeek[index].date, index, e.target.value)} />
+                    </label>
+                  </li>
 
-          <label>
-            Prise de poste:
-            <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(daysOfWeek[index].date, index, e.target.value)} />
-          </label>
-          <label>
-            Fin de poste:
-            <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(daysOfWeek[index].date, index, e.target.value)} />
-          </label>
+                  <li>
+                    <label htmlFor="pause-time" className="weekForm__label">
+                      Temps de pause:
+                      <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(daysOfWeek[index].date, index, e.target.value)} />
+                    </label>
+                  </li>
+                </div>
+                {hoursPerDay[index].worktime === "Erreur" ? <p>Erreur</p> : <p>Nombre d'heures travailler: {hoursPerDay[index].worktime}</p>}
+              </ul>
+            ))}
 
-          <label>
-            Temps de pause:
-            <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(daysOfWeek[index].date, index, e.target.value)} />
-          </label>
+            <div className="totalHours">
+              <p>Nombre d'heure de la semaine: {weekWorkTime.totalHours}</p>
+              <p>Module: {weekWorkTime.modulationHours}</p>
+              <p>heure supp: {weekWorkTime.additionalHours}</p>
+            </div>
 
-          {hoursPerDay[index].worktime === "Erreur" ? <p>Erreur</p> : <p>Nombre d'heure travailler: {hoursPerDay[index].worktime}</p>}
-        </div>
-      ))}
+            <div className="buttons">
+              <button onClick={handleCalcHour}>Calcul</button>
 
-      <p>Nombre d'heure de la semaine: {weekWorkTime.totalHours}</p>
-      <p>Module: {weekWorkTime.modulationHours}</p>
-      <p>heure supp: {weekWorkTime.additionalHours}</p>
+              <button onClick={handleSubmit}>Envoyer</button>
+            </div>
+          </div>
+        )}
 
-      <button onClick={handleCalcHour}>Calcul</button>
-
-      <button onClick={handleSubmit}>Envoyer</button>
-
-      {submitClick ? (
-        <WeeklyConfirm
-          daysOfWeek={daysOfWeek}
-          hoursPerDay={hoursPerDay}
-          weekWorkTime={weekWorkTime}
-          submitClick={submitClick}
-          setSubmitClick={setSubmitClick}
-          events={events}
-          dataSent={dataSent}
-          setDataSent={setDataSent}
-        />
-      ) : (
-        ""
-      )}
-    </form>
+        {submitClick ? (
+          <WeeklyConfirm
+            daysOfWeek={daysOfWeek}
+            hoursPerDay={hoursPerDay}
+            weekWorkTime={weekWorkTime}
+            submitClick={submitClick}
+            setSubmitClick={setSubmitClick}
+            events={events}
+            dataSent={dataSent}
+            setDataSent={setDataSent}
+          />
+        ) : (
+          ""
+        )}
+      </form>
+    </>
   );
 };
 

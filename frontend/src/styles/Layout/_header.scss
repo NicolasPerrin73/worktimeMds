@@ -4,14 +4,24 @@
   align-items: center;
   width: 100%;
   box-shadow: -3px 3px 10px black;
-
-  @include desktop-only {
-  }
+  background-color: $color-quaternary;
 
   &__logo {
-    width: 150px;
+    width: 100px;
+  }
 
-    @include desktop-only {
-    }
+  &__name {
+    font-size: 18px;
+    font-family: "Rye", Arial, Helvetica, sans-serif;
+  }
+
+  &__link {
+    @include flex-column-center;
+    font-weight: 500;
+    font-size: 16px;
+  }
+
+  & i {
+    font-size: 26px;
   }
 }

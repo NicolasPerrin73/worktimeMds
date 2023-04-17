@@ -1,0 +1,68 @@
+h1 {
+  text-align: center;
+  font-size: 22px;
+}
+
+.weekForm {
+  width: 95%;
+  margin: auto;
+  @include flex-column-center;
+  font-family: "Coustard", Arial, Helvetica, sans-serif;
+
+  &__days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+
+  & ul {
+    background-color: $color-quaternary;
+    padding: 5px;
+    margin-bottom: 5px;
+    @include border-radius;
+  }
+
+  &__label {
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: $color-tertiary;
+    @include border-radius;
+    margin-bottom: 5px;
+    height: 70px;
+    width: 140px;
+    padding: 4px;
+
+    &--week {
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+
+  & input {
+    margin-top: 7px;
+    width: 30%;
+    height: 40px;
+    min-width: 85px;
+  }
+}
+
+.totalHours {
+  background-color: $color-tertiary;
+  padding: 10px;
+  width: 100%;
+  @include border-radius;
+  & p {
+    margin-bottom: 5px;
+  }
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px;
+  width: 100%;
+}

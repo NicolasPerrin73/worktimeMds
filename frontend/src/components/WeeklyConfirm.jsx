@@ -49,22 +49,32 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
 
   return (
     <>
-      <div>
+      <ul className="confirm">
         <h2>Merci de verifier les informations avant envoi:</h2>
-        {daysOfWeek.map((dayFr, index) => (
-          <div key={index}>
+        {events.map((dayFr, index) => (
+          <li key={index}>
             <p>
-              {daysOfWeek[index].dateFr}: {hoursPerDay[index].start}-{hoursPerDay[index].end} avec {hoursPerDay[index].pause}h de pause
+              {daysOfWeek[index].dateFr}:<br />{" "}
+              <strong>
+                {hoursPerDay[index].start}-{hoursPerDay[index].end}
+              </strong>{" "}
+              <br />
+              avec <strong>{hoursPerDay[index].pause}h </strong> de pause
             </p>
-          </div>
+          </li>
         ))}
-        <p>
-          Soit un total de: {weekWorkTime.totalHours} dont {weekWorkTime.modulationHours}h de modulation, et {weekWorkTime.additionalHours}h d'heures supplémentaires pour la semaine n°
-          {weekWorkTime.weekNumber}
+        <p className="confirm__result">
+          Soit un total de: <br /> <strong>{weekWorkTime.totalHours}h </strong>travaillées <br />
+          <strong>{weekWorkTime.modulationHours}h</strong> de modulation, <br /> <strong>{weekWorkTime.additionalHours}h</strong> supplémentaires <br />
+          pour la semaine n°
+          <strong>{weekWorkTime.weekNumber}</strong>
         </p>
-      </div>
-      <button onClick={handleSend}>Envoyer</button>
-      <button onClick={handleCancel}>Annuler</button>
+
+        <div className="buttons">
+          <button onClick={handleSend}>Envoyer</button>
+          <button onClick={handleCancel}>Annuler</button>
+        </div>
+      </ul>
     </>
   );
 };

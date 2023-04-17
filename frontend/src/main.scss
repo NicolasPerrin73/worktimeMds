@@ -1,6 +1,9 @@
-@import "./styles/Base/normalize";
-@import "./styles/Base/general";
 @import "./styles/Utils/mixin";
 @import "./styles/Utils/variables";
+@import "./styles/Base/normalize";
+@import "./styles/Base/general";
 @import "./styles/Pages/login";
 @import "./styles/Layout/header";
+@import "./styles/Layout/weeklyHoursForm";
+@import "./styles/Layout/weeklyConfirm";
+@import "./styles/Layout/fullCalendar";

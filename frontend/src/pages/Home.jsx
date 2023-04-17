@@ -2,9 +2,8 @@ import React, { useEffect } from "react";
 import { useUserdata } from "../hooks/hooks";
 import Header from "../components/Header";
 import { useState } from "react";
-import moment from "moment";
-import FullCalendar from "@fullcalendar/react"; // must go before plugins
-import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import frLocale from "@fullcalendar/core/locales/fr";
 
@@ -63,7 +62,11 @@ const Home = () => {
     <>
       <Header userData={userData} />
       <WeeklyHoursForm events={events} setEvents={setEvents} dataSent={dataSent} setDataSent={setDataSent} />
-      {isLoading ? "" : <FullCalendar plugins={[timeGridPlugin]} initialView="timeGridWeek" events={eventsInDB} locale={frLocale} allDaySlot={false} weekNumbers={true} />}
+      {isLoading ? (
+        ""
+      ) : (
+        <FullCalendar plugins={[timeGridPlugin]} initialView="timeGridWeek" events={eventsInDB} locale={frLocale} allDaySlot={false} weekNumbers={true} slotDuration="01:00:00" height={700} />
+      )}
     </>
   );
 };
