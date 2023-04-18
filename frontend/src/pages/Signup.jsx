@@ -28,7 +28,7 @@ const Signup = () => {
   const [samePassword, setSamePassword] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (password === passwordConfirm) {

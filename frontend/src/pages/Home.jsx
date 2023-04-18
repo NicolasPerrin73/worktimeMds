@@ -46,6 +46,9 @@ const Home = () => {
       .then((res) => {
         const data = res.data;
         setEventInDB(data);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 500);
         setIsLoading(false);
       })
       .then(() => {})
@@ -54,6 +57,10 @@ const Home = () => {
       });
   }, [dataSent]);
 
+  const handleEventClik = () => {
+    console.log("click");
+  };
+
   return (
     <>
       <Header userData={userData} />
@@ -61,7 +68,18 @@ const Home = () => {
       {isLoading ? (
         ""
       ) : (
-        <FullCalendar plugins={[timeGridPlugin]} initialView="timeGridWeek" events={eventsInDB} locale={frLocale} allDaySlot={false} weekNumbers={true} slotDuration="01:00:00" height={700} />
+        <FullCalendar
+          plugins={[timeGridPlugin]}
+          initialView="timeGridWeek"
+          events={eventsInDB}
+          locale={frLocale}
+          allDaySlot={false}
+          weekNumbers={true}
+          slotDuration="01:00:00"
+          height={700}
+          timeZone="UTC"
+          eventClick={handleEventClik}
+        />
       )}
     </>
   );

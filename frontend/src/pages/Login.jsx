@@ -18,7 +18,7 @@ function Login() {
   const [formEmailIsValid, setFormEmailIsValid] = useState(false);
   const [formPasswordIsValid, setFormPasswordIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
-  const navigate = useNavigate();
+  let navigate = useNavigate();
 
   /**
    *Capture OnClick and try to connect user
