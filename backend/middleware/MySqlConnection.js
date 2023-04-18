@@ -9,7 +9,7 @@ const planningMdsDB = mysql.createPool({
   database: "planningMds",
   multipleStatements: true,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 20,
   queueLimit: 0,
 });
 

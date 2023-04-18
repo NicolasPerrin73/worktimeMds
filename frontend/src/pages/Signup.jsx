@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import Email from "../components/Email";
 import Password from "../components/Password";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import Name from "../components/Name";
 import PasswordConfirm from "../components/PasswordConfirm";
 import { useEffect } from "react";
@@ -28,6 +28,7 @@ const Signup = () => {
   const [samePassword, setSamePassword] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (password === passwordConfirm) {
@@ -65,7 +66,7 @@ const Signup = () => {
     } else if (formIsValid === true) {
       setFormErrorMessage(false);
       axios
-        .post("http://localhost:3009/api/auth/signup", {
+        .post("https://minidev.fr:3010/api/auth/signup", {
           email: mail,
           password: password,
           firstName: firstName,
@@ -74,7 +75,7 @@ const Signup = () => {
         .then(function (res) {
           const token = res.data.token;
           localStorage.setItem("token", token);
-          window.location.href = "/";
+          navigate("/");
         })
         .catch(function (error) {
           console.log(error);

@@ -52,6 +52,7 @@ exports.login = (req, res, next) => {
       //User not find
     } else if (results[0] == undefined) {
       res.status(401).json("login error: Invalid user or password");
+      console.log("utilisateur introuvable");
       //User finded
     } else {
       bcrypt
@@ -60,6 +61,7 @@ exports.login = (req, res, next) => {
           //Password incorrect
           if (!valid) {
             res.status(401).json("login error: Invalid user or password");
+            console.log("mot de passe invalide");
             //Password correct
           } else {
             const token = jwt.sign({ userId: results[0].id }, process.env.TOKEN_KEY, { expiresIn: "7d" });

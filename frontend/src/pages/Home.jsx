@@ -11,10 +11,6 @@ import WeeklyHoursForm from "../components/WeeklyHoursForm";
 import axios from "axios";
 
 const Home = () => {
-  // Redirection if no token in localStorage
-  if (localStorage.length === 0) {
-    window.location.href = "/login";
-  }
   // Custom hook
   const { userData } = useUserdata();
   const [eventsInDB, setEventInDB] = useState([
@@ -43,7 +39,7 @@ const Home = () => {
     const token = localStorage.getItem("token");
     axios
       .get(
-        "http://localhost:3009/api/planning/planning",
+        "https://minidev.fr:3010/api/planning/planning",
 
         { headers: { Authorization: `Bearer ${token}` } }
       )

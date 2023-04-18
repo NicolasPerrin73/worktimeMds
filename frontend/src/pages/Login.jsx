@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import Email from "../components/Email";
 import Password from "../components/Password";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 /**
  *Component to log in
@@ -18,6 +18,7 @@ function Login() {
   const [formEmailIsValid, setFormEmailIsValid] = useState(false);
   const [formPasswordIsValid, setFormPasswordIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
+  const navigate = useNavigate();
 
   /**
    *Capture OnClick and try to connect user
@@ -34,7 +35,7 @@ function Login() {
       setFormErrorMessage(false);
       e.preventDefault();
       axios
-        .post("http://localhost:3009/api/auth/login", {
+        .post("https://minidev.fr:3010/api/auth/login", {
           email: mail,
           password: password,
         })
@@ -42,7 +43,7 @@ function Login() {
           const token = res.data.token;
           localStorage.setItem("token", token);
           setLoginError(false);
-          window.location.href = "/";
+          navigate("/");
         })
         .catch(function (error) {
           setLoginError(true);
