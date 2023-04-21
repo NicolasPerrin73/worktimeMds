@@ -54,7 +54,8 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
         {daysOfWeek.map((dayFr, index) => (
           <li key={index}>
             <p>
-              {daysOfWeek[index].dateFr}:<br />{" "}
+              {daysOfWeek[index].dateFr}: <strong> {events[index].title}</strong>
+              <br />{" "}
               <strong>
                 {hoursPerDay[index].start}-{hoursPerDay[index].end}
               </strong>{" "}
