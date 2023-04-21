@@ -18,7 +18,7 @@ export function useUserdata() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get("https://minidev.fr:3010/api/auth/user", {
+      .get(`${process.env.REACT_APP_API_URL}/api/auth/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

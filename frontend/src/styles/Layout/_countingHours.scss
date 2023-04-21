@@ -1,0 +1,13 @@
+.counting {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  background-color: $color-tertiary;
+  @include box-shadow;
+
+  &__hours {
+    display: flex;
+    gap: 10px;
+  }
+}

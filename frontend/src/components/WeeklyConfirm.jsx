@@ -9,7 +9,7 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
     const token = localStorage.getItem("token");
     axios
       .post(
-        "https://minidev.fr:3010/api/planning/hours",
+        `${process.env.REACT_APP_API_URL}/api/planning/hours`,
         {
           data,
         },
@@ -24,7 +24,7 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
 
     axios
       .post(
-        "https://minidev.fr:3010/api/planning/planning",
+        `${process.env.REACT_APP_API_URL}/api/planning/planning`,
         {
           data,
         },

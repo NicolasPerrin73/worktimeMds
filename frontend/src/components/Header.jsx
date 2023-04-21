@@ -15,6 +15,7 @@ const Header = ({ userData }) => {
         <p className="header__name">
           {userData.first_name} <br /> {userData.last_name}
         </p>
+
         <Link to="/login" onClick={handleExit} className="header__link">
           <i className="fa-solid fa-right-from-bracket"></i>
           <span>Déconnexion</span>

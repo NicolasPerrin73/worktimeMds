@@ -6,13 +6,13 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
   const [weekNumber, setWeekNumber] = useState("");
   const [daysOfWeek, setDaysOfWeek] = useState([]);
   const [hoursPerDay, setHoursPerDay] = useState([
-    { day: "monday", start: "", end: "", pause: "", worktime: "" },
-    { day: "tuesday", start: "", end: "", pause: "", worktime: "" },
-    { day: "wednesday", start: "", end: "", pause: "", worktime: "" },
-    { day: "thursday", start: "", end: "", pause: "", worktime: "" },
-    { day: "friday", start: "", end: "", pause: "", worktime: "" },
-    { day: "saturday", start: "", end: "", pause: "", worktime: "" },
-    { day: "sunday", start: "", end: "", pause: "", worktime: "" },
+    { day: "monday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "tuesday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "wednesday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "thursday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "friday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "saturday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
+    { day: "sunday", start: "", end: "", pause: "", worktime: "", type: "", title: "" },
   ]);
   const [weekWorkTime, setWeekWorkTime] = useState({
     weekNumber: weekNumber,
@@ -21,8 +21,9 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
     additionalHours: 0,
   });
   const [submitClick, setSubmitClick] = useState(false);
-
-  useEffect(() => {}, [hoursPerDay, daysOfWeek, weekNumber]);
+  const [selectedValues, setSelectedValues] = useState(["", "", "", "", "", "", ""]);
+  const [daysMissingError, setDaysMissingError] = useState(false);
+  const [eventsTitle, setEventsTitle] = useState();
 
   useEffect(() => {
     if (daysOfWeek.length !== 0) {
@@ -31,11 +32,15 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
       }
     }
     const eventsArray = hoursPerDay
-      .filter(({ start, end }) => start !== "" && end !== "") // Filter out items with empty start and end
-      .map(({ day, start, end, worktime, pause }) => ({
-        title: `travail ${worktime}h, dont ${pause}h de pause`,
+      .filter(({ start, end, pause }) => start !== "" && end !== "" && pause !== "") // Filter out items with empty start and end
+      .map(({ day, start, end, worktime, pause, type, title, index }) => ({
+        title: title,
         start: `${day}T${start}:00`,
         end: `${day}T${end}:00`,
+        workedHours: worktime,
+        weekNumber: weekNumber,
+        day: day,
+        type: type,
       }));
 
     setEvents(eventsArray);
@@ -96,8 +101,29 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
     setHoursPerDay(hoursPerDayNewArray);
   };
 
+  const handleRadioChange = (day, event, index) => {
+    const newSelectedValues = [...selectedValues];
+    newSelectedValues[index] = event.target.value;
+    let title = "";
+    if (event.target.value === "worked") {
+      title = "Jour travaillé";
+    } else if (event.target.value === "moduled") {
+      title = "Jour modulé";
+    } else if (event.target.value === "CP") {
+      title = "Congé Payé";
+    } else if (event.target.value === "off") {
+      title = "Repos hebdomadaire";
+    } else if (event.target.value === "ATAM") {
+      title = "Accident de travail / Arrêt maladie";
+    }
+    setSelectedValues(newSelectedValues);
+    let hoursPerDayNewArray = hoursPerDay.slice();
+    hoursPerDayNewArray[index] = { ...hoursPerDayNewArray[index], day: day, start: "08:00", end: "16:00", pause: "01:00", worktime: 7, type: event.target.value, title: title };
+    setHoursPerDay(hoursPerDayNewArray);
+  };
+
   const workTimeCalcul = (i) => {
-    if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "" || hoursPerDay[i].pause === "") {
+    if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "" || hoursPerDay[i].pause === "" || hoursPerDay[i].type !== "worked") {
       return 0;
     } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "" && hoursPerDay[i].pause !== "") {
       // Date de début
@@ -177,14 +203,21 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
       }
     }
     weeklyWorkingHours(totalHours);
-    setSubmitClick(true);
+    if (events.length < 7) {
+      setDaysMissingError(true);
+    } else {
+      setDaysMissingError(false);
+      setSubmitClick(true);
+    }
+
     // envoyer les données à l'API ici
   };
 
   return (
     <>
       <h1>Saisie de planification:</h1>
-      <form onSubmit={handleSubmit} className="weekForm">
+
+      <div className="weekForm">
         {submitClick ? (
           ""
         ) : (
@@ -197,24 +230,111 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
             {daysOfWeek.map((dayFr, index) => (
               <ul key={index}>
                 <li>{daysOfWeek[index].dateFr}</li>
+                <form className="inputRadio">
+                  <li>
+                    <label htmlFor="typeWorked">
+                      <input
+                        type="radio"
+                        name={`type-${index}`}
+                        id="typeWorked"
+                        value="worked"
+                        checked={selectedValues[index] === "worked"}
+                        onChange={(e) => handleRadioChange(daysOfWeek[index].date, e, index)}
+                      />
+                      JT
+                    </label>
+                  </li>
+                  <li>
+                    <label htmlFor="typeModuled">
+                      <input
+                        type="radio"
+                        name={`type-${index}`}
+                        id="typeModuled"
+                        value="moduled"
+                        checked={selectedValues[index] === "moduled"}
+                        onChange={(e) => handleRadioChange(daysOfWeek[index].date, e, index)}
+                      />
+                      JM
+                    </label>
+                  </li>
+
+                  <li>
+                    <label htmlFor="typePaidLeave">
+                      <input
+                        type="radio"
+                        name={`type-${index}`}
+                        id="typePaidLeave"
+                        value="CP"
+                        checked={selectedValues[index] === "CP"}
+                        onChange={(e) => handleRadioChange(daysOfWeek[index].date, e, index)}
+                      />
+                      CP
+                    </label>
+                  </li>
+                  <li>
+                    <label htmlFor="typeOff">
+                      <input
+                        type="radio"
+                        name={`type-${index}`}
+                        id="typeOff"
+                        value="off"
+                        checked={selectedValues[index] === "off"}
+                        onChange={(e) => handleRadioChange(daysOfWeek[index].date, e, index)}
+                      />
+                      RH
+                    </label>
+                  </li>
+                  <li>
+                    <label htmlFor="typeSickLeave">
+                      <input
+                        type="radio"
+                        name={`type-${index}`}
+                        id="typeSickLeave"
+                        value="ATAM"
+                        checked={selectedValues[index] === "ATAM"}
+                        onChange={(e) => handleRadioChange(daysOfWeek[index].date, e, index)}
+                      />
+                      AT/AM
+                    </label>
+                  </li>
+                </form>
+
                 <div className="weekForm__days">
                   <li>
                     <label htmlFor="start-time" className="weekForm__label">
                       Prise de poste:
-                      <input type="time" id="start-time" name="start-time" value={hoursPerDay[index].start} onChange={(e) => handleStartHour(daysOfWeek[index].date, index, e.target.value)} />
+                      <input
+                        type="time"
+                        id="start-time"
+                        name="start-time"
+                        value={selectedValues[index] === "worked" || selectedValues[index] === "" ? hoursPerDay[index].start : "08:00"}
+                        onChange={(e) => handleStartHour(daysOfWeek[index].date, index, e.target.value)}
+                      />
                     </label>
                   </li>
                   <li>
                     <label htmlFor="end-time" className="weekForm__label">
                       Fin de poste:
-                      <input type="time" id="end-time" name="end-time" value={hoursPerDay[index].end} onChange={(e) => handleEndHour(daysOfWeek[index].date, index, e.target.value)} />
+                      <input
+                        type="time"
+                        id="end-time"
+                        name="end-time"
+                        value={selectedValues[index] === "worked" || selectedValues[index] === "" ? hoursPerDay[index].end : "16:00"}
+                        onChange={(e) => handleEndHour(daysOfWeek[index].date, index, e.target.value)}
+                      />
                     </label>
                   </li>
 
                   <li>
                     <label htmlFor="pause-time" className="weekForm__label">
                       Temps de pause:
-                      <input type="time" id="pause-time" name="pause-time" value={hoursPerDay[index].pause} onChange={(e) => handleBreakHour(daysOfWeek[index].date, index, e.target.value)} />
+                      <input
+                        type="time"
+                        id="pause-time"
+                        name="pause-time"
+                        value={selectedValues[index] === "worked" || selectedValues[index] === "" ? hoursPerDay[index].pause : "01:00"}
+                        onChange={(e) => handleBreakHour(daysOfWeek[index].date, index, e.target.value)}
+                      />
                     </label>
                   </li>
                 </div>
@@ -233,6 +353,7 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
 
               <button onClick={handleSubmit}>Envoyer</button>
             </div>
+            {daysMissingError === true ? <p className="form__errorMessage"> ⚠️Merci de remplir toutes les journées de la semaine ⚠️</p> : ""}
           </div>
         )}
 
@@ -250,7 +371,12 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
         ) : (
           ""
         )}
-      </form>
+
+        <p className="weekForm__legend">
+          Légende: <br /> <strong>JT:</strong> Jour travaillé, <strong>JM:</strong> Jour Modulé, <strong>CP:</strong> Congé payé, <strong>RH:</strong> Repos Hebdomadaire, <strong>AT/AM:</strong>{" "}
+          Accident Travail/ Arret maladie
+        </p>
+      </div>
     </>
   );
 };

@@ -47,6 +47,22 @@ h1 {
     height: 40px;
     min-width: 85px;
   }
+
+  &__legend {
+    font-size: 14px;
+    text-align: center;
+    padding: 5px;
+  }
+}
+
+.inputRadio {
+  display: flex;
+  & input {
+    height: 20px !important;
+    width: 20px !important;
+    min-width: 20px !important;
+    margin: 10px;
+  }
 }
 
 .totalHours {

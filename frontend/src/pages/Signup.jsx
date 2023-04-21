@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 import Email from "../components/Email";
 import Password from "../components/Password";
 import axios from "axios";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Name from "../components/Name";
 import PasswordConfirm from "../components/PasswordConfirm";
 import { useEffect } from "react";
@@ -66,7 +66,7 @@ const Signup = () => {
     } else if (formIsValid === true) {
       setFormErrorMessage(false);
       axios
-        .post("https://minidev.fr:3010/api/auth/signup", {
+        .post(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
           email: mail,
           password: password,
           firstName: firstName,

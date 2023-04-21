@@ -311,6 +311,7 @@ template {
 
 body {
   font-family: "Tillana", Arial, Helvetica, sans-serif;
+  min-width: 320px;
 }
 
 * {
@@ -540,6 +541,21 @@ h1 {
   height: 40px;
   min-width: 85px;
 }
+.weekForm__legend {
+  font-size: 14px;
+  text-align: center;
+  padding: 5px;
+}
+
+.inputRadio {
+  display: flex;
+}
+.inputRadio input {
+  height: 20px !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  margin: 10px;
+}
 
 .totalHours {
   background-color: #ffbb00;
@@ -595,6 +611,19 @@ h1 {
 
 .fc-event-time {
   white-space: pre-wrap !important;
+}
+
+.counting {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  background-color: #ffbb00;
+  box-shadow: -3px 3px 4px black;
+}
+.counting__hours {
+  display: flex;
+  gap: 10px;
 }
 
 /*# sourceMappingURL=index.css.map */
