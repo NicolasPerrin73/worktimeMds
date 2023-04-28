@@ -1,6 +1,6 @@
 import React from "react";
 
-const CountingHours = ({ totalWorkedHours, totalModulationHours, totalAdditionalHours }) => {
+const CountingHours = ({ totalWorkedHours, totalModulationHours, totalAdditionalHours, totalCpCount }) => {
   return (
     <div className="counting">
       <h2>Compteur d'heures:</h2>
@@ -13,6 +13,9 @@ const CountingHours = ({ totalWorkedHours, totalModulationHours, totalAdditional
         </p>
         <p>
           Supplémentaires: <strong> {totalAdditionalHours}h</strong>
+        </p>
+        <p>
+          Congé Payés posé: <strong>{totalCpCount}</strong>
         </p>
       </div>
     </div>

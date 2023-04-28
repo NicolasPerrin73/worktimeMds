@@ -37,6 +37,7 @@ const Home = () => {
   const [totalWorkedHours, setTotalWorkedHours] = useState();
   const [totalModulationHours, setTotalModulationHours] = useState();
   const [totalAdditionalHours, setTotalAdditionalHours] = useState();
+  const [totalCpCount, setTotalCpCount] = useState();
 
   //Get events from DB
   useEffect(() => {
@@ -85,6 +86,8 @@ const Home = () => {
     setTotalModulationHours(totalModulationHours);
     const totalAdditionalHours = data.reduce((acc, curr) => acc + curr.total_additional_hours, 0);
     setTotalAdditionalHours(totalAdditionalHours);
+    const totalCpCount = data.reduce((acc, curr) => acc + curr.total_cp_hours, 0);
+    setTotalCpCount(totalCpCount / 7);
   };
 
   const handleEventClik = () => {
@@ -94,7 +97,7 @@ const Home = () => {
   return (
     <>
       <Header userData={userData} totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} />
-      <CountingHours totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} />
+      <CountingHours totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} totalCpCount={totalCpCount} />
       <WeeklyHoursForm events={events} setEvents={setEvents} dataSent={dataSent} setDataSent={setDataSent} />
       {isLoading ? (
         ""
