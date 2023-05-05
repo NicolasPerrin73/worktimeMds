@@ -5,7 +5,7 @@ import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import frLocale from "@fullcalendar/core/locales/fr";
-
+import { Link, useNavigate } from "react-router-dom";
 import WeeklyHoursForm from "../components/WeeklyHoursForm";
 import axios from "axios";
 import CountingHours from "../components/CountingHours";
@@ -13,6 +13,8 @@ import CountingHours from "../components/CountingHours";
 const Home = () => {
   // Custom hook
   const { userData } = useUserdata();
+  //Hook
+  let navigate = useNavigate();
   const [eventsInDB, setEventInDB] = useState([
     { title: "", start: "", end: "" },
     { title: "", start: "", end: "" },
@@ -57,6 +59,9 @@ const Home = () => {
       .then(() => {})
       .catch((err) => {
         console.log(err);
+        if (err.response.status === 401) {
+          navigate("/login");
+        }
       });
   }, [dataSent]);
 
