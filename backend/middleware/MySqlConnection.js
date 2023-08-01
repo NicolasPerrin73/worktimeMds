@@ -1,11 +1,12 @@
 const mysql = require("mysql2");
+const dotenv = require("dotenv").config({ path: "../../API/.env" });
 
 //MySql connection
 
 const planningMdsDB = mysql.createPool({
   host: "82.165.49.163",
-  user: process.env.MY_SQL_USER,
-  password: process.env.MY_SQL_PASSWORD,
+  user: process.env.WORKTIME__SQL_USER,
+  password: process.env.WORKTIME__SQL_PASSWORD,
   database: "planningMds",
   multipleStatements: true,
   waitForConnections: true,

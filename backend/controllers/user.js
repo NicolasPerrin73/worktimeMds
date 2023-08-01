@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const planningMdsDB = require("../middleware/MySqlConnection");
 const fs = require("fs");
+const dotenv = require("dotenv").config({ path: "../../API/.env" });
 
 // Sign up
 exports.signup = (req, res, next) => {
@@ -25,7 +26,7 @@ exports.signup = (req, res, next) => {
                 res.status(500).json("signup error : " + err.message + " at file ../controllers/user.js:line26");
                 //send userId and token
               } else {
-                const token = jwt.sign({ userId: results[0].id }, process.env.TOKEN_KEY, { expiresIn: "7d" });
+                const token = jwt.sign({ userId: results[0].id }, process.env.WORKTIME__KEY, { expiresIn: "7d" });
                 res.status(200).json({
                   userId: results[0].id,
                   token: token,
@@ -64,7 +65,7 @@ exports.login = (req, res, next) => {
             console.log("mot de passe invalide");
             //Password correct
           } else {
-            const token = jwt.sign({ userId: results[0].id }, process.env.TOKEN_KEY, { expiresIn: "7d" });
+            const token = jwt.sign({ userId: results[0].id }, process.env.WORKTIME__KEY, { expiresIn: "7d" });
             res.status(200).json({
               userId: results[0].id,
               token: token,

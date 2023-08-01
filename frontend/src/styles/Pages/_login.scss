@@ -1,6 +1,7 @@
 .login_container {
   @include flex-column-center;
   height: 100vh;
+  justify-content: center;
 
   &--error {
     justify-content: center;

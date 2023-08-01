@@ -3,6 +3,7 @@ const http = require("http");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
+const dotenv = require("dotenv").config({ path: "../../API/.env" });
 // File import
 const app = require("./app");
 
@@ -17,7 +18,7 @@ const normalizePort = (val) => {
   }
   return false;
 };
-const port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(process.env.WORKTIME_PORT || "3000");
 app.set("port", port);
 
 const errorHandler = (error) => {
@@ -51,9 +52,9 @@ server.on("listening", () => {
 
 server.listen(port);
 
-//const keyPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/privkey3.pem";
-//const certPath = "/opt/psa/var/modules/letsencrypt/etc/archive/minidev.fr/fullchain3.pem";
+//const keyPath = process.env.CERT_KEYPATH;
+//const certPath = process.env.CERT_CERTPATH;
 
 //const sslServer = https.createServer({ key: fs.readFileSync(keyPath), cert: fs.readFileSync(certPath) }, app);
 
-//sslServer.listen(process.env.SSL_PORT, () => console.log("Ssl server listening " + process.env.SSL_PORT));
+//sslServer.listen(process.env.WORKTIME_SSL_PORT, () => console.log("Ssl server listening " + process.env.WORKTIME_SSL_PORT));

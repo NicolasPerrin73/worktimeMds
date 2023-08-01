@@ -1,0 +1,14 @@
+.success {
+  width: 60%;
+  height: 100px;
+  @include flex-column-center;
+  justify-content: center;
+  background-color: $color-tertiary;
+  @include border-radius;
+  opacity: 1;
+  transition: all 500ms 3s ease-in-out;
+
+  &--none {
+    opacity: 0;
+  }
+}

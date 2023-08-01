@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import WeeklyConfirm from "./WeeklyConfirm";
+import NetworkError from "./NetworkError";
+import SentData from "./SentData";
 
-const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
+const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent, errorCode, setErrorCode, errorMessage, setErrorMessage, networkError, setNetworkError }) => {
   const [weekNumber, setWeekNumber] = useState("");
   const [daysOfWeek, setDaysOfWeek] = useState([]);
   const [hoursPerDay, setHoursPerDay] = useState([
@@ -19,11 +21,13 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
     totalHours: 0,
     modulationHours: 0,
     additionalHours: 0,
+    cpHours: 0,
   });
   const [submitClick, setSubmitClick] = useState(false);
   const [selectedValues, setSelectedValues] = useState(["", "", "", "", "", "", ""]);
   const [daysMissingError, setDaysMissingError] = useState(false);
-  const [eventsTitle, setEventsTitle] = useState();
+  const [hoursSent, setHoursSent] = useState(false);
+  const [planningSent, setPlanningSent] = useState(false);
 
   useEffect(() => {
     if (daysOfWeek.length !== 0) {
@@ -105,112 +109,121 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
     const newSelectedValues = [...selectedValues];
     newSelectedValues[index] = event.target.value;
     let title = "";
+    let worktime = 0;
     if (event.target.value === "worked") {
       title = "Jour travaillé";
+      worktime = 7;
     } else if (event.target.value === "moduled") {
       title = "Jour modulé";
+      worktime = 0;
     } else if (event.target.value === "CP") {
       title = "Congé Payé";
+      worktime = 7;
     } else if (event.target.value === "off") {
       title = "Repos hebdomadaire";
+      worktime = 0;
     } else if (event.target.value === "ATAM") {
       title = "Accident de travail / Arrêt maladie";
+      worktime = 7;
     }
     setSelectedValues(newSelectedValues);
     let hoursPerDayNewArray = hoursPerDay.slice();
-    hoursPerDayNewArray[index] = { ...hoursPerDayNewArray[index], day: day, start: "08:00", end: "16:00", pause: "01:00", worktime: 7, type: event.target.value, title: title };
+    hoursPerDayNewArray[index] = { ...hoursPerDayNewArray[index], day: day, start: "08:00", end: "16:00", pause: "01:00", worktime: worktime, type: event.target.value, title: title };
     setHoursPerDay(hoursPerDayNewArray);
   };
 
   const workTimeCalcul = (i) => {
-    if (daysOfWeek[i] === "" || hoursPerDay[i].start === "" || hoursPerDay[i].end === "" || hoursPerDay[i].pause === "" || hoursPerDay[i].type !== "worked") {
-      return 0;
-    } else if (daysOfWeek[i] !== "" && hoursPerDay[i].start !== "" && hoursPerDay[i].end !== "" && hoursPerDay[i].pause !== "") {
-      // Date de début
-      const startDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].start}:00`);
-      // Date de fin
-      const endDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].end}:00`);
-      // Temps de pause
-      const [hours, minutes] = hoursPerDay[i].pause.split(":");
-      const breakInMs = (+hours * 60 + +minutes) * 60 * 1000;
+    // Date de début
+    const startDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].start}:00`);
+    // Date de fin
+    const endDate = new Date(`${daysOfWeek[i].date}T${hoursPerDay[i].end}:00`);
+    // Temps de pause
+    const [hours, minutes] = hoursPerDay[i].pause.split(":");
+    const breakInMs = (+hours * 60 + +minutes) * 60 * 1000;
 
-      // Calcul du nombre de millisecondes entre les deux dates
-      const diffInMs = endDate - startDate - breakInMs;
-      // Calcul du nombre d'heures arrondi à 2 décimales
-      let wortimeResult = Math.round((diffInMs / (1000 * 60 * 60)) * 100) / 100;
+    // Calcul du nombre de millisecondes entre les deux dates
+    const diffInMs = endDate - startDate - breakInMs;
+    // Calcul du nombre d'heures arrondi à 2 décimales
+    let wortimeResult = Math.round((diffInMs / (1000 * 60 * 60)) * 100) / 100;
 
-      if (wortimeResult < 0) {
-        wortimeResult = "Erreur";
-      }
+    if (wortimeResult < 0) {
+      wortimeResult = "Erreur";
+    }
 
-      return wortimeResult;
+    return wortimeResult;
+  };
+
+  const weeklyWorkingHours = (totalHours, totalCpHours) => {
+    if (totalHours <= 35 && totalCpHours >= 35) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: 0, additionalHours: 0, cpHours: totalCpHours });
+      console.log("totalHours <= 35 && totalCpHours >= 35");
+    } else if (totalHours <= 35 && totalCpHours <= 35 && totalCpHours >= 1) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: 0, additionalHours: 0, cpHours: totalCpHours });
+      console.log("totalHours <= 35 && totalCpHours <= 35");
+    } else if (totalHours <= 35) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0, cpHours: totalCpHours });
+      console.log("totalHours <= 35");
+    } else if (totalHours <= 42) {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0, cpHours: totalCpHours });
+      console.log("totalHours <= 42");
+    } else {
+      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: 7, additionalHours: totalHours - 42, cpHours: totalCpHours });
+      console.log("else");
     }
   };
 
-  const weeklyWorkingHours = (totalHours) => {
-    if (totalHours <= 35) {
-      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0 });
-    } else if (totalHours <= 42) {
-      setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: totalHours - 35, additionalHours: 0 });
-    } else {
-      return setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, modulationHours: 7, additionalHours: totalHours - 42 });
+  const calcHours = () => {
+    let hoursPerDayNewArray = hoursPerDay.slice();
+    for (let i = 0; i < hoursPerDay.length; i++) {
+      if (hoursPerDayNewArray[i].type === "worked") {
+        let worktime = workTimeCalcul(i);
+        hoursPerDayNewArray[i] = { ...hoursPerDayNewArray[i], worktime: worktime };
+        setHoursPerDay(hoursPerDayNewArray);
+      }
     }
+    let cpHoursArray = [];
+    let wortimeArray = [];
+    let totalHours = 0;
+    let totalCpHours = 0;
+    for (let i = 0; i < hoursPerDayNewArray.length; i++) {
+      if (hoursPerDayNewArray[i].worktime === "Erreur") {
+        alert("Erreur de saisie, calcul impossible");
+      } else {
+        if (hoursPerDayNewArray[i].type === "CP") {
+          cpHoursArray.push(hoursPerDayNewArray[i].worktime);
+          totalCpHours = cpHoursArray.reduce((accumulator, currentValue) => {
+            return accumulator + currentValue;
+          }, 0);
+          setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, cpHours: totalCpHours });
+        } else wortimeArray.push(hoursPerDayNewArray[i].worktime);
+        totalHours = wortimeArray.reduce((accumulator, currentValue) => {
+          return accumulator + currentValue;
+        }, 0);
+        setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, cpHours: totalCpHours });
+      }
+    }
+    weeklyWorkingHours(totalHours, totalCpHours);
   };
 
   const handleCalcHour = (e) => {
     e.preventDefault();
-    let hoursPerDayNewArray = hoursPerDay.slice();
-    for (let i = 0; i < hoursPerDay.length; i++) {
-      let worktime = workTimeCalcul(i);
-      hoursPerDayNewArray[i] = { ...hoursPerDayNewArray[i], worktime: worktime };
-      setHoursPerDay(hoursPerDayNewArray);
+    calcHours();
+    if (events.length < 7) {
+      setDaysMissingError(true);
+    } else {
+      setDaysMissingError(false);
     }
-    let wortimeArray = [];
-    let totalHours = 0;
-    for (let i = 0; i < hoursPerDayNewArray.length; i++) {
-      if (hoursPerDayNewArray[i].worktime === "Erreur") {
-        alert("Erreur de saisie, calcul impossible");
-      } else {
-        wortimeArray.push(hoursPerDayNewArray[i].worktime);
-        totalHours = wortimeArray.reduce((accumulator, currentValue) => {
-          return accumulator + currentValue;
-        });
-        setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours });
-      }
-    }
-    weeklyWorkingHours(totalHours);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    let hoursPerDayNewArray = hoursPerDay.slice();
-    for (let i = 0; i < hoursPerDay.length; i++) {
-      let worktime = workTimeCalcul(i);
-      hoursPerDayNewArray[i] = { ...hoursPerDayNewArray[i], worktime: worktime };
-      setHoursPerDay(hoursPerDayNewArray);
-    }
-    let wortimeArray = [];
-    let totalHours = 0;
-    for (let i = 0; i < hoursPerDayNewArray.length; i++) {
-      if (hoursPerDayNewArray[i].worktime === "Erreur") {
-        alert("Erreur de saisie, calcul impossible");
-      } else {
-        wortimeArray.push(hoursPerDayNewArray[i].worktime);
-        totalHours = wortimeArray.reduce((accumulator, currentValue) => {
-          return accumulator + currentValue;
-        });
-        setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours });
-      }
-    }
-    weeklyWorkingHours(totalHours);
+    calcHours();
     if (events.length < 7) {
       setDaysMissingError(true);
     } else {
       setDaysMissingError(false);
       setSubmitClick(true);
     }
-
-    // envoyer les données à l'API ici
   };
 
   return (
@@ -218,10 +231,17 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
       <h1>Saisie de planification:</h1>
 
       <div className="weekForm">
+        {(planningSent === true) & (hoursSent === true) ? (
+          <SentData setPlanningSent={setPlanningSent} planningSent={planningSent} setHoursSent={setHoursSent} hoursSent={hoursSent} />
+        ) : networkError === true ? (
+          <NetworkError errorCode={errorCode} errorMessage={errorMessage} networkError={networkError} setNetworkError={setNetworkError} />
+        ) : (
+          ""
+        )}
         {submitClick ? (
           ""
         ) : (
-          <div>
+          <div className={(planningSent === true) & (hoursSent === true) ? "none" : ""}>
             <label htmlFor="week" className="weekForm__label weekForm__label--week">
               <span>Semaine n°:</span>
               <input type="number" id="week" value={weekNumber} onChange={handleWeekChange} />
@@ -343,9 +363,15 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
             ))}
 
             <div className="totalHours">
-              <p>Nombre d'heure de la semaine: {weekWorkTime.totalHours}</p>
-              <p>Module: {weekWorkTime.modulationHours}</p>
-              <p>heure supp: {weekWorkTime.additionalHours}</p>
+              {daysMissingError === true ? (
+                <p className="form__errorMessage"> ⚠️Merci de remplir toutes les journées de la semaine ⚠️</p>
+              ) : (
+                <>
+                  <p>Nombre d'heure de la semaine: {weekWorkTime.totalHours}</p>
+                  <p>Module: {weekWorkTime.modulationHours}</p>
+                  <p>heure supp: {weekWorkTime.additionalHours}</p>
+                </>
+              )}
             </div>
 
             <div className="buttons">
@@ -353,7 +379,6 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
 
               <button onClick={handleSubmit}>Envoyer</button>
             </div>
-            {daysMissingError === true ? <p className="form__errorMessage"> ⚠️Merci de remplir toutes les journées de la semaine ⚠️</p> : ""}
           </div>
         )}
 
@@ -367,15 +392,28 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent }) => {
             events={events}
             dataSent={dataSent}
             setDataSent={setDataSent}
+            planningSent={planningSent}
+            setPlanningSent={setPlanningSent}
+            hoursSent={hoursSent}
+            setHoursSent={setHoursSent}
+            errorCode={errorCode}
+            setErrorCode={setErrorCode}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
+            networkError={networkError}
+            setNetworkError={setNetworkError}
           />
         ) : (
           ""
         )}
 
-        <p className="weekForm__legend">
-          Légende: <br /> <strong>JT:</strong> Jour travaillé, <strong>JM:</strong> Jour Modulé, <strong>CP:</strong> Congé payé, <strong>RH:</strong> Repos Hebdomadaire, <strong>AT/AM:</strong>{" "}
-          Accident Travail/ Arret maladie
-        </p>
+        <div className="weekForm__legend">
+          <h3>Légende:</h3>
+          <p>
+            <strong>JT:</strong> Jour travaillé, <strong>JM:</strong> Jour Modulé, <strong>CP:</strong> Congé payé, <strong>RH:</strong> Repos Hebdomadaire, <strong>AT/AM:</strong> Accident Travail/
+            Arret maladie
+          </p>
+        </div>
       </div>
     </>
   );

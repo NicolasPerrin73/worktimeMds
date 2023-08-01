@@ -7,6 +7,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Name from "../components/Name";
 import PasswordConfirm from "../components/PasswordConfirm";
+import NetworkError from "../components/NetworkError";
 import { useEffect } from "react";
 
 /**
@@ -28,6 +29,9 @@ const Signup = () => {
   const [samePassword, setSamePassword] = useState(false);
   const [formIsValid, setFormIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
+  const [errorCode, setErrorCode] = useState();
+  const [errorMessage, setErrorMessage] = useState();
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -78,6 +82,9 @@ const Signup = () => {
           navigate("/");
         })
         .catch(function (error) {
+          setNetworkError(true);
+          setErrorCode(error.code);
+          setErrorMessage(error.message);
           console.log(error);
         });
     }
@@ -85,6 +92,7 @@ const Signup = () => {
 
   return (
     <>
+      {networkError === true ? <NetworkError errorCode={errorCode} errorMessage={errorMessage} networkError={networkError} setNetworkError={setNetworkError} /> : ""}
       <div className="login_container">
         <img src={logo} alt="logo" className="logo" />
 

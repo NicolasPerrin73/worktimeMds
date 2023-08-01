@@ -7,6 +7,7 @@ h1 {
   width: 95%;
   margin: auto;
   @include flex-column-center;
+  justify-content: center;
   font-family: "Coustard", Arial, Helvetica, sans-serif;
 
   &__days {

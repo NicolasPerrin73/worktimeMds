@@ -1,7 +1,26 @@
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 
-const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, setSubmitClick, events, dataSent, setDataSent }) => {
+const WeeklyConfirm = ({
+  daysOfWeek,
+  hoursPerDay,
+  weekWorkTime,
+  submitClick,
+  setSubmitClick,
+  events,
+  dataSent,
+  setDataSent,
+  errorCode,
+  setErrorCode,
+  errorMessage,
+  setErrorMessage,
+  networkError,
+  setNetworkError,
+  hoursSent,
+  setHoursSent,
+  planningSent,
+  setPlanningSent,
+}) => {
   const handleSend = (e) => {
     const data = [hoursPerDay, weekWorkTime, events];
     console.log("envoie api");
@@ -17,9 +36,18 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
       )
       .then((res) => {
         console.log(res);
+        if (res.status === 200) {
+          setHoursSent(true);
+          setTimeout(() => {
+            setHoursSent(false);
+          }, 2000);
+        }
       })
       .catch((err) => {
         console.log(err);
+        setNetworkError(true);
+        setErrorCode(err.code);
+        setErrorMessage(err.message);
       });
 
     axios
@@ -33,12 +61,19 @@ const WeeklyConfirm = ({ daysOfWeek, hoursPerDay, weekWorkTime, submitClick, set
       .then((res) => {
         console.log(res);
         setDataSent(true);
+        setPlanningSent(true);
+        setTimeout(() => {
+          setPlanningSent(false);
+        }, 2000);
         setTimeout(() => {
           setDataSent(false);
         }, 1000);
       })
       .catch((err) => {
         console.log(err);
+        setNetworkError(true);
+        setErrorCode(err.code);
+        setErrorMessage(err.message);
       });
   };
 

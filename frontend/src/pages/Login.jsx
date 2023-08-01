@@ -5,6 +5,7 @@ import Email from "../components/Email";
 import Password from "../components/Password";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import NetworkError from "../components/NetworkError";
 
 /**
  *Component to log in
@@ -15,6 +16,9 @@ function Login() {
   const [mail, setEmail] = useState([]);
   const [password, setPassword] = useState([]);
   const [loginError, setLoginError] = useState(false);
+  const [networkError, setNetworkError] = useState(false);
+  const [errorCode, setErrorCode] = useState();
+  const [errorMessage, setErrorMessage] = useState();
   const [formEmailIsValid, setFormEmailIsValid] = useState(false);
   const [formPasswordIsValid, setFormPasswordIsValid] = useState(false);
   const [formErrorMessage, setFormErrorMessage] = useState(false);
@@ -46,13 +50,21 @@ function Login() {
           navigate("/");
         })
         .catch(function (error) {
-          setLoginError(true);
+          console.log(error);
+          if (error.code === "ERR_NETWORK") {
+            setNetworkError(true);
+            setErrorCode(error.code);
+            setErrorMessage(error.message);
+          } else if (error.code === 401) {
+            setLoginError(true);
+          }
         });
     }
   };
 
   return (
     <>
+      {networkError === true ? <NetworkError errorCode={errorCode} errorMessage={errorMessage} networkError={networkError} setNetworkError={setNetworkError} /> : ""}
       <div className="login_container">
         <img src={logo} alt="logo de la mer de sable" className="logo" />
 

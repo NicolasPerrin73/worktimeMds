@@ -6,8 +6,9 @@ exports.addWeekHours = (req, res, next) => {
   const weekWorkTime = req.body.data[1];
 
   const querySelectWorkedHours = "SELECT user_id, week_number FROM worked_hours WHERE user_id=? AND week_number = ?";
-  const queryInsertWorkedHours = "INSERT INTO worked_hours (user_id,week_number,total_worked_hours,total_modulation_hours,total_additional_hours) VALUES (?,?,?,?,?)";
-  const queryUpdateWorkedHours = "UPDATE worked_hours SET user_id = ?,week_number=?,total_worked_hours=?,total_modulation_hours=?,total_additional_hours=?  WHERE user_id=? AND week_number = ?";
+  const queryInsertWorkedHours = "INSERT INTO worked_hours (user_id,week_number,total_worked_hours,total_modulation_hours,total_additional_hours, total_cp_hours) VALUES (?,?,?,?,?,?)";
+  const queryUpdateWorkedHours =
+    "UPDATE worked_hours SET user_id = ?,week_number=?,total_worked_hours=?,total_modulation_hours=?,total_additional_hours=?, total_cp_hours=?  WHERE user_id=? AND week_number = ?";
 
   planningMdsDB.query(querySelectWorkedHours, [req.auth.userId, weekWorkTime.weekNumber], function (err, result, fields) {
     if (err != null) {
@@ -15,7 +16,7 @@ exports.addWeekHours = (req, res, next) => {
     } else if (result[0] === undefined) {
       planningMdsDB.query(
         queryInsertWorkedHours,
-        [req.auth.userId, weekWorkTime.weekNumber, weekWorkTime.totalHours, weekWorkTime.modulationHours, weekWorkTime.additionalHours],
+        [req.auth.userId, weekWorkTime.weekNumber, weekWorkTime.totalHours, weekWorkTime.modulationHours, weekWorkTime.additionalHours, weekWorkTime.cpHours],
         function (err, result, fields) {
           if (err != null) {
             res.status(500).json("addWeek error:" + err.message + "at file ../controllers/planning.js:line21");
@@ -27,7 +28,7 @@ exports.addWeekHours = (req, res, next) => {
     } else if (result[0] !== undefined) {
       planningMdsDB.query(
         queryUpdateWorkedHours,
-        [req.auth.userId, weekWorkTime.weekNumber, weekWorkTime.totalHours, weekWorkTime.modulationHours, weekWorkTime.additionalHours, req.auth.userId, weekWorkTime.weekNumber],
+        [req.auth.userId, weekWorkTime.weekNumber, weekWorkTime.totalHours, weekWorkTime.modulationHours, weekWorkTime.additionalHours, weekWorkTime.cpHours, req.auth.userId, weekWorkTime.weekNumber],
         function (err, result, fields) {
           if (err != null) {
             res.status(500).json("addWeek error:" + err.message + "at file ../controllers/planning.js:line33");

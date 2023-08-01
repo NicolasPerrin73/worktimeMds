@@ -5,14 +5,20 @@ import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import frLocale from "@fullcalendar/core/locales/fr";
-
+import { Link, useNavigate } from "react-router-dom";
 import WeeklyHoursForm from "../components/WeeklyHoursForm";
 import axios from "axios";
 import CountingHours from "../components/CountingHours";
+import NetworkError from "../components/NetworkError";
 
 const Home = () => {
   // Custom hook
   const { userData } = useUserdata();
+  const [networkError, setNetworkError] = useState(false);
+  const [errorCode, setErrorCode] = useState();
+  const [errorMessage, setErrorMessage] = useState();
+  //Hook
+  let navigate = useNavigate();
   const [eventsInDB, setEventInDB] = useState([
     { title: "", start: "", end: "" },
     { title: "", start: "", end: "" },
@@ -37,6 +43,7 @@ const Home = () => {
   const [totalWorkedHours, setTotalWorkedHours] = useState();
   const [totalModulationHours, setTotalModulationHours] = useState();
   const [totalAdditionalHours, setTotalAdditionalHours] = useState();
+  const [totalCpCount, setTotalCpCount] = useState();
 
   //Get events from DB
   useEffect(() => {
@@ -56,6 +63,13 @@ const Home = () => {
       .then(() => {})
       .catch((err) => {
         console.log(err);
+        if (err.response.status === 401) {
+          navigate("/login");
+        } else if (err.response.status !== 401) {
+          setNetworkError(true);
+          setErrorCode(err.code);
+          setErrorMessage(err.message);
+        }
       });
   }, [dataSent]);
 
@@ -75,6 +89,9 @@ const Home = () => {
       .then(() => {})
       .catch((err) => {
         console.log(err);
+        setNetworkError(true);
+        setErrorCode(err.code);
+        setErrorMessage(err.message);
       });
   }, [dataSent]);
 
@@ -85,6 +102,8 @@ const Home = () => {
     setTotalModulationHours(totalModulationHours);
     const totalAdditionalHours = data.reduce((acc, curr) => acc + curr.total_additional_hours, 0);
     setTotalAdditionalHours(totalAdditionalHours);
+    const totalCpCount = data.reduce((acc, curr) => acc + curr.total_cp_hours, 0);
+    setTotalCpCount(totalCpCount / 7);
   };
 
   const handleEventClik = () => {
@@ -93,9 +112,21 @@ const Home = () => {
 
   return (
     <>
+      {networkError === true ? <NetworkError errorCode={errorCode} errorMessage={errorMessage} networkError={networkError} setNetworkError={setNetworkError} /> : ""}
       <Header userData={userData} totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} />
-      <CountingHours totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} />
-      <WeeklyHoursForm events={events} setEvents={setEvents} dataSent={dataSent} setDataSent={setDataSent} />
+      <CountingHours totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} totalCpCount={totalCpCount} />
+      <WeeklyHoursForm
+        events={events}
+        setEvents={setEvents}
+        dataSent={dataSent}
+        setDataSent={setDataSent}
+        errorCode={errorCode}
+        setErrorCode={setErrorCode}
+        errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
+        networkError={networkError}
+        setNetworkError={setNetworkError}
+      />
       {isLoading ? (
         ""
       ) : (
@@ -108,7 +139,7 @@ const Home = () => {
           weekNumbers={true}
           slotDuration="01:00:00"
           height={700}
-          timeZone="local"
+          timeZone="Europe/Paris"
           eventClick={handleEventClik}
         />
       )}
