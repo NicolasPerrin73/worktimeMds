@@ -26,11 +26,8 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent, errorCode, 
   const [submitClick, setSubmitClick] = useState(false);
   const [selectedValues, setSelectedValues] = useState(["", "", "", "", "", "", ""]);
   const [daysMissingError, setDaysMissingError] = useState(false);
-<<<<<<< HEAD
   const [hoursSent, setHoursSent] = useState(false);
   const [planningSent, setPlanningSent] = useState(false);
-=======
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
 
   useEffect(() => {
     if (daysOfWeek.length !== 0) {
@@ -202,11 +199,6 @@ const WeeklyHoursForm = ({ events, setEvents, dataSent, setDataSent, errorCode, 
         totalHours = wortimeArray.reduce((accumulator, currentValue) => {
           return accumulator + currentValue;
         }, 0);
-<<<<<<< HEAD
-=======
-        console.log(wortimeArray);
-        console.log(totalHours);
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
         setWeekWorkTime({ ...weekWorkTime, totalHours: totalHours, cpHours: totalCpHours });
       }
     }

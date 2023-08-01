@@ -14,12 +14,9 @@ import NetworkError from "../components/NetworkError";
 const Home = () => {
   // Custom hook
   const { userData } = useUserdata();
-<<<<<<< HEAD
   const [networkError, setNetworkError] = useState(false);
   const [errorCode, setErrorCode] = useState();
   const [errorMessage, setErrorMessage] = useState();
-=======
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
   //Hook
   let navigate = useNavigate();
   const [eventsInDB, setEventInDB] = useState([
@@ -68,13 +65,10 @@ const Home = () => {
         console.log(err);
         if (err.response.status === 401) {
           navigate("/login");
-<<<<<<< HEAD
         } else if (err.response.status !== 401) {
           setNetworkError(true);
           setErrorCode(err.code);
           setErrorMessage(err.message);
-=======
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
         }
       });
   }, [dataSent]);
@@ -121,7 +115,6 @@ const Home = () => {
       {networkError === true ? <NetworkError errorCode={errorCode} errorMessage={errorMessage} networkError={networkError} setNetworkError={setNetworkError} /> : ""}
       <Header userData={userData} totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} />
       <CountingHours totalWorkedHours={totalWorkedHours} totalModulationHours={totalModulationHours} totalAdditionalHours={totalAdditionalHours} totalCpCount={totalCpCount} />
-<<<<<<< HEAD
       <WeeklyHoursForm
         events={events}
         setEvents={setEvents}
@@ -134,9 +127,6 @@ const Home = () => {
         networkError={networkError}
         setNetworkError={setNetworkError}
       />
-=======
-      <WeeklyHoursForm events={events} setEvents={setEvents} dataSent={dataSent} setDataSent={setDataSent} />
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
       {isLoading ? (
         ""
       ) : (

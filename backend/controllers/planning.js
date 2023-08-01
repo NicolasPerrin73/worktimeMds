@@ -8,11 +8,7 @@ exports.addWeekHours = (req, res, next) => {
   const querySelectWorkedHours = "SELECT user_id, week_number FROM worked_hours WHERE user_id=? AND week_number = ?";
   const queryInsertWorkedHours = "INSERT INTO worked_hours (user_id,week_number,total_worked_hours,total_modulation_hours,total_additional_hours, total_cp_hours) VALUES (?,?,?,?,?,?)";
   const queryUpdateWorkedHours =
-<<<<<<< HEAD
     "UPDATE worked_hours SET user_id = ?,week_number=?,total_worked_hours=?,total_modulation_hours=?,total_additional_hours=?, total_cp_hours=?  WHERE user_id=? AND week_number = ?";
-=======
-    "UPDATE worked_hours SET user_id = ?,week_number=?,total_worked_hours=?,total_modulation_hours=?,total_additional_hours=? total_cp_hours=?  WHERE user_id=? AND week_number = ?";
->>>>>>> d246019fe56d375233451b2937f40d6c4f2ab563
 
   planningMdsDB.query(querySelectWorkedHours, [req.auth.userId, weekWorkTime.weekNumber], function (err, result, fields) {
     if (err != null) {
